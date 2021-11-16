@@ -1,101 +1,61 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-function Layout(props) {
-  return <div style={{ background: 'palegoldenrod' }}>
-    {props.children}
-  </div>
-}
 
-function Login() {
-  return <p>Please login!</p>
-}
-
-function SignOut() {
-  return <button>Sign Out</button>
-}
-
-const isAuthenticated = true;
-
-// function component
-function Header(props) {
-  return <h1>Hello {props.name}!</h1>
-}
-
-function Person(props) {
-
-  function handlePersonClick() {
-    alert(props.person);
-  }
-
-  return <li onClick={handlePersonClick}>{props.person}</li>
-}
-
+const base_url = 'https://api.github.com/users/';
 
 function App() {
-  const [developer, setDeveloper] = React.useState({
-    language: 'python',
-    yearsExperience: 0
-  });
 
-  function handleChangeLanguage() {
-    return setDeveloper({
-      ...developer,
-      language: 'javascript'
-    });
-  }
+    const [userName, setUserName] = React.useState('ilei2');
+    const [user, setUser] = React.useState(null);
+    const searchInput = React.useRef();
 
-  function handleChangeYearsExperience(event) {
-    return setDeveloper({
-      ...developer,
-      yearsExperience: event.target.value
-    });
-  }
-  // const [language, setLanguage] = React.useState('some text');
-  // const [yearsExperience, setYearsExperience] = React.useState(0);
-  
-  // const inputValue = inputState[0];
-  // const setInputValue = inputState[1];
+    React.useEffect(() => {
+        getUser();
+    }, []);
 
-  const people = ['Chris', 'Ivy'];
+    function handleClearInput() {
+        searchInput.current.value = "";
+        searchInput.current.focus();
+    }
 
-  // function handleInputChange(event) {
-  //   setLanguage(event.target.value);
-  // }
+    // synchronous
+    // React.useEffect(() => {
+    //     fetch(base_url)
+    //     .then(response => response.json())
+    //     .then(data => setUser(data));
+    // }, []);
 
-  // map method
-  // people.map(person => <Header name={person}/>);
+    // async
+    async function getUser() {
+        const response = await fetch(`${base_url}${userName}`)
+        const data = await response.json();
+        setUser(data);
+    }
 
-  return (<Layout>
-    {isAuthenticated ? (
-      <>
-        <ul>
-          {people.map((person, i) => (
-            <Person key={i} person={person} />
-          ))}
-          {/* <input onChange={handleInputChange} /> */}
-        </ul>
+    return (
+    <div>
+        <input 
+            type="text" 
+            placeholder="Input username" 
+            onChange={event => setUserName(event.target.value)}
+            ref={searchInput}
+        />
+        <button onClick={getUser}>Search</button>
+        <button onClick={handleClearInput}>Clear</button>
+        {user ? (
+            <>
+            <div>{user.name}</div>
+            <p>{user.bio}</p>
+            <img alt="avatar" src={user.avatar_url} style={{height: 25}} />
+            </>
+        ) : <p>Loading</p>}
+    </div>
+    )
 
-        <button onClick={() => handleChangeLanguage()}>Change language</button>
-        <div>
-          <input
-            type="number"
-            onChange={event => handleChangeYearsExperience(event)}
-          />
-        </div>
-        <p>I am learning {developer.language}</p>
-        <p>I have {developer.yearsExperience} years of experience.</p>
-
-        <SignOut />
-      </>
-    ) : <Login />}
-    <footer>Copyright 2021</footer>
-  </Layout>);
 }
 
-const year = 2021;
-const greeting = <div>Hello React in {year}</div>;
-const rootNode = document.getElementById('root');
+const rootNode = document.getElementById("root");
 
 ReactDOM.render(
   <App/>,
