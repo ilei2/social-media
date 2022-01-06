@@ -4,8 +4,8 @@ import Post from "./Post";
 function PostList({ posts }) {
     return (
     <div>
-        {posts.map((post, i) => (
-            <Post key={i} {...post} /> //object spread operator
+        {posts.map(post => (
+            <Post key={post.id} {...post} /> //object spread operator
         ))}
     </div>
     )
